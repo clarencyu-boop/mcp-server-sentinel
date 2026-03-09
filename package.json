@@ -1,13 +1,14 @@
 {
   "name": "mcp-server-sentinel",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "MCP server for Sentinel Bot — algorithmic trading backtesting, bot management, and account operations via AI agents",
   "type": "module",
   "bin": {
-    "mcp-server-sentinel": "./src/index.mjs"
+    "mcp-server-sentinel": "./bin/mcp-server-sentinel.mjs"
   },
   "files": [
     "src/",
+    "bin/",
     "README.md",
     "LICENSE"
   ],
