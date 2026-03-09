@@ -1,0 +1,43 @@
+{
+  "name": "mcp-server-sentinel",
+  "version": "1.2.0",
+  "description": "MCP server for Sentinel Bot — algorithmic trading backtesting, bot management, and account operations via AI agents",
+  "type": "module",
+  "bin": {
+    "mcp-server-sentinel": "./src/index.mjs"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "sentinel-bot",
+    "crypto",
+    "trading",
+    "backtesting",
+    "algorithmic-trading",
+    "ai-agent",
+    "bot-management",
+    "claude"
+  ],
+  "author": "Sentinel Bot <support@sentinel.redclawey.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clarencyu-boop/mcp-server-sentinel.git"
+  },
+  "homepage": "https://sentinel.redclawey.com",
+  "bugs": {
+    "url": "https://github.com/clarencyu-boop/mcp-server-sentinel/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.23.8"
+  }
+}
