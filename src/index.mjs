@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Sentinel Bot MCP Server v1.2.0
+ * Sentinel Bot MCP Server v1.3.0
  *
  * Tools:
  *   Backtest:

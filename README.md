@@ -1,5 +1,7 @@
 # mcp-server-sentinel
 
+**[English](README.md)** | **[繁體中文](README.zh-TW.md)** | **[简体中文](README.zh-CN.md)** | **[日本語](README.ja.md)** | **[한국어](README.ko.md)**
+
 MCP server for [Sentinel Bot](https://sentinel.redclawey.com) — algorithmic trading backtesting, bot management, and account operations via AI agents.
 
 This server implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io) and provides 17 tools that let AI agents run crypto backtests, deploy trading bots, manage accounts, and handle payments — all through natural language.
