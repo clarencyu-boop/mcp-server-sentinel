@@ -1,6 +1,6 @@
 {
   "name": "mcp-server-sentinel",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "MCP server for Sentinel Bot — algorithmic trading backtesting, bot management, and account operations via AI agents",
   "type": "module",
   "bin": {

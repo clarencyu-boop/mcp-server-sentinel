@@ -8,7 +8,7 @@ This server implements the [Model Context Protocol (MCP)](https://modelcontextpr
 
 ### 1. Get an API Key
 
-Sign up at [sentinel.redclawey.com](https://sentinel.redclawey.com) and subscribe to an **Expert plan** ($99/mo+). Then generate an API key from your dashboard under **Settings > API Keys**.
+Sign up for free at [sentinel.redclawey.com](https://sentinel.redclawey.com). API key access is available on **all plans including the free trial**. Generate an API key from your dashboard under **Settings > API Keys**. Buy credits to start backtesting, then upgrade your plan when you need more bots.
 
 ### 2. Install
 
@@ -159,16 +159,16 @@ BTC, ETH, SOL, XRP, BNB, DOGE, LINK, TRX, SUI
 
 | Plan | Price | Bots | API Key | Symbols |
 |---|---|---|---|---|
-| Trial | Free (7 days) | 1 | No | BTC |
-| Starter | $19/mo | 3 | No | 5 |
-| Pro | $49/mo | 5 | No | 8 |
-| **Expert** | **$99/mo** | **8** | **Yes** | **10** |
+| Trial | Free (7 days) | 1 | Yes | BTC |
+| Starter | $19/mo | 3 | Yes | 5 |
+| Pro | $49/mo | 5 | Yes | 8 |
+| Expert | $99/mo | 8 | Yes | 10 |
 | Expert 10 | $125/mo | 10 | Yes | 10 |
 | Expert 15 | $190/mo | 15 | Yes | 10 |
 | Expert 30 | $385/mo | 30 | Yes | 10 |
 | Expert 60 | $775/mo | 60 | Yes | 10 |
 
-**API key access (required for this MCP server) is only available on Expert plans.**
+**API key access is available on all plans.** Start with the free trial, buy credits to run backtests, and upgrade when you need more bots or symbols.
 
 Credits are consumed per backtest run. Top up with `create_payment_link` or `create_crypto_invoice` using `strategy_id: "credits_topup"` (min $10, 17 credits per $1).
 

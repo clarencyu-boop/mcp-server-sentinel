@@ -116,17 +116,17 @@ const PLAN_CATALOG = {
   plans: [
     {
       id: "trial",        name: "Free Trial",       price_usd: 0,   duration: "7 days",
-      max_bots: 1,        symbols: ["BTC"],          api_key_access: false,
+      max_bots: 1,        symbols: ["BTC"],          api_key_access: true,
     },
     {
       id: "plan_starter", name: "Starter",           price_usd: 19,  billing: "monthly",
       max_bots: 3,        symbols: ["BTC","ETH","SOL","XRP","BNB"],
-      api_key_access: false,
+      api_key_access: true,
     },
     {
       id: "plan_pro",     name: "Pro",               price_usd: 49,  billing: "monthly",
       max_bots: 5,        symbols: ["BTC","ETH","SOL","XRP","BNB","DOGE","LINK","TRX"],
-      api_key_access: false,
+      api_key_access: true,
     },
     {
       id: "plan_expert",  name: "Expert (8 bots)",   price_usd: 99,  billing: "monthly",
@@ -143,7 +143,7 @@ const PLAN_CATALOG = {
     { method: "helio",        description: "Card (Visa/Mastercard) or USDC on Solana", tool: "create_payment_link"   },
     { method: "nowpayments",  description: "300+ cryptocurrencies (BTC, ETH, SOL, USDT, …)", tool: "create_crypto_invoice" },
   ],
-  note: "API key access (required for MCP) is only available on Expert plans.",
+  note: "API key access is available on all plans including Free Trial. Buy credits to run backtests, upgrade plan for more bots.",
 };
 
 // ── MCP Server ────────────────────────────────────────────────
