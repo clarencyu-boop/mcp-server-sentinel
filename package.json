@@ -1,6 +1,6 @@
 {
   "name": "mcp-server-sentinel",
-  "version": "1.3.1",
+  "version": "2.0.0",
   "mcpName": "io.github.clarencyu-boop/sentinel",
   "description": "MCP server for Sentinel Bot — algorithmic trading backtesting, bot management, and account operations via AI agents",
   "type": "module",
@@ -23,7 +23,12 @@
     "algorithmic-trading",
     "ai-agent",
     "bot-management",
-    "claude"
+    "claude",
+    "grid-optimization",
+    "strategy-marketplace",
+    "ai-strategy",
+    "trading-signals",
+    "smc-analysis"
   ],
   "author": "Sentinel Bot <support@sentinel.redclawey.com>",
   "license": "MIT",

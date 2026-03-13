@@ -4,7 +4,7 @@
 
 [Sentinel Bot](https://sentinel.redclawey.com) MCP 서버 — AI 에이전트를 통한 알고리즘 트레이딩 백테스트, 봇 관리 및 계정 운영.
 
-이 서버는 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)을 구현하며, AI 에이전트가 암호화폐 백테스트 실행, 트레이딩 봇 배포, 계정 관리, 결제 처리를 자연어로 수행할 수 있는 17개 도구를 제공합니다.
+이 서버는 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)을 구현하며, AI 에이전트가 암호화폐 백테스트 실행, 트레이딩 봇 배포, 파라미터 최적화, 전략 마켓플레이스 탐색, 계정 관리, 결제 처리를 자연어로 수행할 수 있는 36개 도구를 제공합니다.
 
 ## 빠른 시작
 
@@ -63,7 +63,7 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 | `SENTINEL_API_KEY` | 예 | — | API 키 (`sk-`로 시작) |
 | `SENTINEL_API_URL` | 아니오 | `https://sentinel.redclawey.com/api/v1` | API 기본 URL |
 
-## 도구 (17개)
+## 도구 (36개)
 
 ### 백테스트
 
@@ -83,14 +83,58 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 | `get_bot` | 봇의 전체 정보와 현재 상태를 가져옵니다. |
 | `start_bot` | 봇을 시작합니다 (`exchange_id` 설정 필요). 실시간 거래 신호를 전송합니다. |
 | `stop_bot` | 실행 중이거나 일시 중지된 봇을 중지합니다. |
+| `pause_bot` | 실행 중인 봇을 일시 중지합니다 (포지션 유지, 새 신호 중단). RUNNING 상태만 가능. |
+| `recover_bot` | HALTED 상태의 봇을 복구합니다 (서킷 브레이커 리셋). HALTED 상태만 가능. |
 | `delete_bot` | 봇을 영구 삭제합니다 (먼저 중지 필요). |
 | `get_bot_performance` | 봇의 누적 손익, 승률, 거래 횟수를 가져옵니다. |
+| `get_bot_trades` | 봇의 페이지네이션된 거래 이력을 가져옵니다 (진입/청산 가격, 손익 포함). |
 
 ### 거래소
 
 | 도구 | 설명 |
 |---|---|
 | `list_exchanges` | 설정된 거래소 인증 정보를 나열합니다 (Binance, Bybit, OKX 등). 봇 생성 시 거래소 ID를 사용합니다. |
+
+### OKX 거래소
+
+| 도구 | 설명 |
+|---|---|
+| `okx_orderbook` | OKX 호가창을 가져옵니다 (공개 데이터, 인증 불필요). |
+| `okx_funding_rate` | OKX 무기한 선물의 현재 펀딩 비율을 가져옵니다. |
+| `okx_set_leverage` | OKX에서 레버리지와 마진 모드를 설정합니다 (OKX 인증 필요). |
+| `okx_positions` | 현재 OKX 포지션을 가져옵니다 (OKX 인증 필요). |
+| `okx_algo_order` | OKX에서 조건부/알고 주문을 실행합니다 (TP/SL/트레일링/OCO). |
+| `okx_market_overview` | OKX 상승률 순위와 거래량 리더를 가져옵니다 (공개 데이터). |
+
+### AI 전략
+
+| 도구 | 설명 |
+|---|---|
+| `build_strategy` | 자연어로 AI를 활용해 트레이딩 전략을 생성합니다. 1 크레딧 소모. `strategy_blocks` JSON을 반환하며, `create_bot` 또는 `run_backtest`에 바로 사용 가능합니다. |
+
+### Grid 최적화
+
+| 도구 | 설명 |
+|---|---|
+| `run_grid_backtest` | 파라미터 스윕 백테스트. 각 조합당 1 크레딧 소모. 대기 모드 지원. |
+| `get_grid_status` | Grid 백테스트 진행 상황과 상위 10개 결과를 확인합니다. |
+| `get_grid_results` | 전체 페이지네이션된 Grid 결과를 가져옵니다. 다양한 지표로 정렬 가능. |
+
+### 분석 및 신호
+
+| 도구 | 설명 |
+|---|---|
+| `get_analysis` | 최신 SMC 분석을 가져옵니다: 방향, 점수, AI 요약. 분석 구독 필요. |
+| `get_analysis_history` | 과거 일간 분석 실행 이력을 나열합니다. |
+| `get_signals` | 봇의 거래 신호를 가져옵니다 (방향, 가격, 실행 상태 포함). |
+
+### 전략 마켓플레이스
+
+| 도구 | 설명 |
+|---|---|
+| `list_strategies` | 마켓플레이스 전략을 탐색합니다. 손익, 승률, 샤프 비율로 랭킹. |
+| `get_strategy_detail` | 전체 전략 상세 + 최근 거래 + 구독 상태. |
+| `subscribe_strategy` | 카피 트레이딩을 구독합니다. 무료 전략은 즉시 활성화; 유료 전략은 결제 URL을 반환합니다. |
 
 ### 계정 및 결제
 
@@ -107,13 +151,15 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 AI 에이전트의 일반적인 워크플로우:
 
 ```
-1. get_account_info        -> 현재 플랜, 크레딧, 봇 용량 확인
-2. run_backtest            -> 전략 테스트 (예: BTC 4h EMA 크로스)
-3. run_backtest            -> 다른 전략과 비교 (예: RSI + ATR 트레일링 스톱)
-4. create_bot              -> 우승 전략 배포 (strategy_blocks 복사)
-5. list_exchanges          -> exchange_id 확인
+1. build_strategy          -> AI가 설명에서 전략 생성 (1 크레딧)
+2. run_backtest            -> 과거 데이터로 검증
+3. run_grid_backtest       -> 파라미터 최적화
+4. get_grid_results        -> 최적 파라미터 조합 탐색
+5. create_bot              -> 최적 파라미터로 배포
 6. start_bot               -> 실전 가동
-7. get_bot_performance     -> 결과 모니터링
+7. get_signals             -> 신호 실행 모니터링
+8. get_analysis            -> 일간 시장 분석 확인
+9. get_bot_performance     -> 손익 확인
 ```
 
 크레딧이 부족할 때:

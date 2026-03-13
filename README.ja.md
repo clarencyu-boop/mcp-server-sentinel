@@ -4,7 +4,7 @@
 
 [Sentinel Bot](https://sentinel.redclawey.com) 用 MCP サーバー — AI エージェントによるアルゴリズム取引バックテスト、ボット管理、アカウント操作。
 
-本サーバーは [Model Context Protocol (MCP)](https://modelcontextprotocol.io) を実装し、17 のツールを提供します。AI エージェントが暗号通貨のバックテスト実行、取引ボットのデプロイ、アカウント管理、決済処理をすべて自然言語で行えます。
+本サーバーは [Model Context Protocol (MCP)](https://modelcontextprotocol.io) を実装し、36 のツールを提供します。AI エージェントが暗号通貨のバックテスト実行、取引ボットのデプロイ、パラメータ最適化、戦略マーケットプレイスの閲覧、アカウント管理、決済処理をすべて自然言語で行えます。
 
 ## クイックスタート
 
@@ -63,7 +63,7 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 | `SENTINEL_API_KEY` | はい | — | API キー（`sk-` で始まる） |
 | `SENTINEL_API_URL` | いいえ | `https://sentinel.redclawey.com/api/v1` | API ベース URL |
 
-## ツール（17 個）
+## ツール（36 個）
 
 ### バックテスト
 
@@ -83,14 +83,58 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 | `get_bot` | ボットの詳細情報と現在のステータスを取得。 |
 | `start_bot` | ボットを起動（`exchange_id` の設定が必要）。リアルタイム取引シグナルを配信。 |
 | `stop_bot` | 実行中または一時停止中のボットを停止。 |
+| `pause_bot` | 実行中のボットを一時停止（ポジション保持、新規シグナル停止）。RUNNING 状態のみ。 |
+| `recover_bot` | HALTED 状態のボットを回復（サーキットブレーカーリセット）。HALTED 状態のみ。 |
 | `delete_bot` | ボットを永久削除（先に停止が必要）。 |
 | `get_bot_performance` | ボットの累計損益、勝率、取引回数を取得。 |
+| `get_bot_trades` | ボットのページネーション付き取引履歴を取得（エントリー/エグジット価格、損益含む）。 |
 
 ### 取引所
 
 | ツール | 説明 |
 |---|---|
 | `list_exchanges` | 設定済み取引所の認証情報を一覧表示（Binance、Bybit、OKX など）。ボット作成時に取引所 ID を使用。 |
+
+### OKX 取引所
+
+| ツール | 説明 |
+|---|---|
+| `okx_orderbook` | OKX のオーダーブックを取得（公開データ、認証不要）。 |
+| `okx_funding_rate` | OKX 永久先物の現在の資金調達率を取得。 |
+| `okx_set_leverage` | OKX のレバレッジとマージンモードを設定（OKX 認証情報が必要）。 |
+| `okx_positions` | 現在の OKX ポジションを取得（OKX 認証情報が必要）。 |
+| `okx_algo_order` | OKX で条件付き/アルゴ注文を発注（TP/SL/トレーリング/OCO）。 |
+| `okx_market_overview` | OKX の値上がりランキングと出来高リーダーを取得（公開データ）。 |
+
+### AI 戦略
+
+| ツール | 説明 |
+|---|---|
+| `build_strategy` | 自然言語から AI で取引戦略を生成。1 クレジット消費。`strategy_blocks` JSON を返却、`create_bot` や `run_backtest` にそのまま使用可能。 |
+
+### Grid 最適化
+
+| ツール | 説明 |
+|---|---|
+| `run_grid_backtest` | パラメータスイープバックテスト。各組合せ 1 クレジット消費。待機モード対応。 |
+| `get_grid_status` | Grid バックテストの進捗と上位 10 件の結果を確認。 |
+| `get_grid_results` | 完全なページネーション付き Grid 結果を取得。各種指標でソート可能。 |
+
+### 分析・シグナル
+
+| ツール | 説明 |
+|---|---|
+| `get_analysis` | 最新の SMC 分析を取得：方向、スコア、AI サマリー。分析サブスクリプションが必要。 |
+| `get_analysis_history` | 過去のデイリー分析実行履歴を一覧表示。 |
+| `get_signals` | ボットの取引シグナルを取得（方向、価格、実行ステータス含む）。 |
+
+### 戦略マーケットプレイス
+
+| ツール | 説明 |
+|---|---|
+| `list_strategies` | マーケットプレイスの戦略を閲覧。損益、勝率、シャープレシオでランキング。 |
+| `get_strategy_detail` | 戦略の完全な詳細 + 最近の取引 + サブスクリプション状況。 |
+| `subscribe_strategy` | コピートレードを購読。無料戦略は即時有効化。有料戦略は決済 URL を返却。 |
 
 ### アカウント・決済
 
@@ -107,13 +151,15 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 AI エージェントの典型的なワークフロー：
 
 ```
-1. get_account_info        -> 現在のプラン・クレジット・ボット容量を確認
-2. run_backtest            -> 戦略をテスト（例：BTC 4h EMA クロス）
-3. run_backtest            -> 別の戦略と比較（例：RSI + ATR トレーリングストップ）
-4. create_bot              -> 勝った戦略をデプロイ（strategy_blocks をコピー）
-5. list_exchanges          -> exchange_id を取得
+1. build_strategy          -> AI が説明から戦略を生成（1 クレジット）
+2. run_backtest            -> 過去データで検証
+3. run_grid_backtest       -> パラメータを最適化
+4. get_grid_results        -> 最良のパラメータ組合せを特定
+5. create_bot              -> 最適パラメータでデプロイ
 6. start_bot               -> 本番稼働
-7. get_bot_performance     -> 結果を監視
+7. get_signals             -> シグナル実行を監視
+8. get_analysis            -> デイリー市場分析を確認
+9. get_bot_performance     -> 損益をレビュー
 ```
 
 クレジットが不足した場合：

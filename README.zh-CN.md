@@ -4,7 +4,7 @@
 
 [Sentinel Bot](https://sentinel.redclawey.com) 的 MCP 服务器 — 通过 AI 代理进行算法交易回测、机器人管理及账户操作。
 
-本服务器实现了 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)，提供 17 个工具，让 AI 代理可以执行加密货币回测、部署交易机器人、管理账户及处理付款 — 全部通过自然语言完成。
+本服务器实现了 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)，提供 36 个工具，让 AI 代理可以执行加密货币回测、部署交易机器人、参数优化、浏览策略市场、管理账户及处理付款 — 全部通过自然语言完成。
 
 ## 快速开始
 
@@ -63,7 +63,7 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 | `SENTINEL_API_KEY` | 是 | — | 您的 API 密钥（以 `sk-` 开头） |
 | `SENTINEL_API_URL` | 否 | `https://sentinel.redclawey.com/api/v1` | API 基础 URL |
 
-## 工具（17 个）
+## 工具（36 个）
 
 ### 回测
 
@@ -83,14 +83,58 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 | `get_bot` | 获取机器人完整详情和当前状态。 |
 | `start_bot` | 启动机器人（需先配置 `exchange_id`）。发送实时交易信号。 |
 | `stop_bot` | 停止运行中或暂停的机器人。 |
+| `pause_bot` | 暂停运行中的机器人（保留仓位，停止新信号）。仅限 RUNNING 状态。 |
+| `recover_bot` | 恢复 HALTED 状态的机器人（重置熔断机制）。仅限 HALTED 状态。 |
 | `delete_bot` | 永久删除机器人（需先停止）。 |
 | `get_bot_performance` | 获取机器人的累计盈亏、胜率和交易次数。 |
+| `get_bot_trades` | 获取机器人的分页交易记录，含进出场价格与盈亏。 |
 
 ### 交易所
 
 | 工具 | 说明 |
 |---|---|
 | `list_exchanges` | 列出已配置的交易所凭证（Binance、Bybit、OKX 等）。创建机器人时使用交易所 ID。 |
+
+### OKX 交易所
+
+| 工具 | 说明 |
+|---|---|
+| `okx_orderbook` | 获取 OKX 订单簿（公开数据，无需凭证）。 |
+| `okx_funding_rate` | 获取 OKX 永续合约当前资金费率。 |
+| `okx_set_leverage` | 设置 OKX 杠杆与保证金模式（需 OKX 凭证）。 |
+| `okx_positions` | 获取当前 OKX 持仓（需 OKX 凭证）。 |
+| `okx_algo_order` | 在 OKX 下条件/算法委托（止盈/止损/追踪/OCO）。 |
+| `okx_market_overview` | 获取 OKX 涨幅榜与成交量排行（公开数据）。 |
+
+### AI 策略
+
+| 工具 | 说明 |
+|---|---|
+| `build_strategy` | 以自然语言通过 AI 生成交易策略。消耗 1 点。返回 `strategy_blocks` JSON，可直接用于 `create_bot` 或 `run_backtest`。 |
+
+### Grid 优化
+
+| 工具 | 说明 |
+|---|---|
+| `run_grid_backtest` | 参数扫描回测。每组参数消耗 1 点。支持等待模式。 |
+| `get_grid_status` | 查询 Grid 回测进度与前 10 名结果。 |
+| `get_grid_results` | 获取完整分页 Grid 结果，可按各项指标排序。 |
+
+### 分析与信号
+
+| 工具 | 说明 |
+|---|---|
+| `get_analysis` | 获取最新 SMC 分析：方向、评分、AI 摘要。需订阅分析服务。 |
+| `get_analysis_history` | 列出历史每日分析记录。 |
+| `get_signals` | 获取机器人交易信号，含方向、价格、执行状态。 |
+
+### 策略市场
+
+| 工具 | 说明 |
+|---|---|
+| `list_strategies` | 浏览市场策略，按盈亏、胜率、Sharpe 排名。 |
+| `get_strategy_detail` | 完整策略详情 + 近期交易 + 订阅状态。 |
+| `subscribe_strategy` | 订阅跟单交易。免费策略立即激活；付费策略返回付款链接。 |
 
 ### 账户与付款
 
@@ -107,13 +151,15 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 AI 代理的典型工作流程：
 
 ```
-1. get_account_info        -> 查看当前方案、点数、机器人容量
-2. run_backtest            -> 测试策略（例：BTC 4h EMA 交叉）
-3. run_backtest            -> 比较另一策略（例：RSI + ATR 追踪止损）
-4. create_bot              -> 部署胜出的策略（复制 strategy_blocks）
-5. list_exchanges          -> 找到 exchange_id
+1. build_strategy          -> AI 根据描述生成策略（消耗 1 点）
+2. run_backtest            -> 以历史数据验证
+3. run_grid_backtest       -> 优化参数
+4. get_grid_results        -> 找出最佳参数组合
+5. create_bot              -> 以最优参数部署
 6. start_bot               -> 上线交易
-7. get_bot_performance     -> 监控结果
+7. get_signals             -> 监控信号执行
+8. get_analysis            -> 查看每日市场分析
+9. get_bot_performance     -> 查看盈亏
 ```
 
 点数用完时：

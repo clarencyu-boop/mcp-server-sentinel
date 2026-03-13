@@ -4,30 +4,30 @@
 
 MCP server for [Sentinel Bot](https://sentinel.redclawey.com) — algorithmic trading backtesting, bot management, and account operations via AI agents.
 
-This server implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io) and provides 17 tools that let AI agents run crypto backtests, deploy trading bots, manage accounts, and handle payments — all through natural language.
+This server implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io), providing 36 tools that let AI agents run crypto backtests, deploy trading bots, optimize parameters, browse strategy marketplace, and manage accounts & payments — all through natural language.
 
 ## Quick Start
 
 ### 1. Get an API Key
 
-Sign up for free at [sentinel.redclawey.com](https://sentinel.redclawey.com). API key access is available on **all plans including the free trial**. Generate an API key from your dashboard under **Settings > API Keys**. Buy credits to start backtesting, then upgrade your plan when you need more bots.
+Sign up for free at [sentinel.redclawey.com](https://sentinel.redclawey.com). **All plans (including the free trial) support API Keys**. Generate a key in your dashboard under **Settings > API Keys**. Purchase credits to start backtesting, then upgrade your plan as needed for more bots.
 
-### 2. Install
+### 2. Installation
 
-#### Claude Code (recommended)
+#### Claude Code (Recommended)
 
 ```bash
 claude mcp add sentinel -- npx mcp-server-sentinel
 ```
 
-Then set the environment variable:
+Then set your environment variable:
 ```bash
 export SENTINEL_API_KEY=sk-your-api-key-here
 ```
 
 #### Claude Desktop
 
-Add to your `claude_desktop_config.json`:
+Add to `claude_desktop_config.json`:
 
 ```json
 {
@@ -43,7 +43,7 @@ Add to your `claude_desktop_config.json`:
 }
 ```
 
-#### Manual (any MCP client)
+#### Manual Setup (Any MCP Client)
 
 ```json
 {
@@ -63,66 +63,112 @@ Add to your `claude_desktop_config.json`:
 | `SENTINEL_API_KEY` | Yes | — | Your API key (starts with `sk-`) |
 | `SENTINEL_API_URL` | No | `https://sentinel.redclawey.com/api/v1` | API base URL |
 
-## Tools (17)
+## Tools (36)
 
 ### Backtesting
 
 | Tool | Description |
 |---|---|
-| `run_backtest` | Submit a backtest and wait for the result. Supports 8 entry types and 6 exit types. Returns summary metrics by default; set `include_trades=true` for full trade list. |
-| `get_backtest_result` | Fetch a specific backtest result by job ID. Optionally polls until completion. |
-| `list_backtests` | List recent backtest jobs with optional status/symbol filters. |
+| `run_backtest` | Submit a backtest and wait for results. Supports 8 entry types and 6 exit types. Returns summary metrics by default; set `include_trades=true` for the full trade list. |
+| `get_backtest_result` | Fetch a specific backtest result by Job ID. Optionally polls until completion. |
+| `list_backtests` | List recent backtest jobs, filterable by status/symbol. |
 | `cancel_backtest` | Cancel a running or queued backtest job. |
 
 ### Bot Management
 
 | Tool | Description |
 |---|---|
-| `list_bots` | List all trading bots with status filter (idle/running/paused/stopped/error/halted). |
+| `list_bots` | List all trading bots with optional status filter (idle/running/paused/stopped/error/halted). |
 | `create_bot` | Create a new bot. Pass `strategy_blocks` from a backtest result to deploy a tested strategy. |
-| `get_bot` | Get full details and current status of a bot. |
-| `start_bot` | Start a bot (must have `exchange_id` configured). Dispatches live trading signals. |
+| `get_bot` | Get full bot details and current status. |
+| `start_bot` | Start a bot (requires `exchange_id` to be set). Dispatches live trading signals. |
 | `stop_bot` | Stop a running or paused bot. |
+| `pause_bot` | Pause a running bot (keeps positions, stops new signals). Only RUNNING bots. |
+| `recover_bot` | Recover a HALTED bot (circuit breaker reset). Only HALTED bots. |
 | `delete_bot` | Permanently delete a bot (must be stopped first). |
 | `get_bot_performance` | Get cumulative PnL, win rate, and trade count for a bot. |
+| `get_bot_trades` | Get paginated trade history for a bot with entry/exit prices, PnL. |
 
 ### Exchanges
 
 | Tool | Description |
 |---|---|
-| `list_exchanges` | List configured exchange credentials (Binance, Bybit, OKX, etc.). Use the exchange ID when creating bots. |
+| `list_exchanges` | List configured exchange credentials (Binance, Bybit, OKX, etc.). Use the exchange ID when creating a bot. |
+
+### OKX Exchange
+
+| Tool | Description |
+|---|---|
+| `okx_orderbook` | Fetch OKX order book (public, no credentials needed). |
+| `okx_funding_rate` | Get current funding rate for OKX perpetual swap. |
+| `okx_set_leverage` | Set leverage and margin mode on OKX (requires OKX credentials). |
+| `okx_positions` | Get current OKX positions (requires OKX credentials). |
+| `okx_algo_order` | Place conditional/algo order on OKX (TP/SL/trailing/OCO). |
+| `okx_market_overview` | Get OKX top movers and volume leaders (public). |
+
+### AI Strategy
+
+| Tool | Description |
+|---|---|
+| `build_strategy` | Generate a trading strategy from natural language using AI. Costs 1 credit. Returns `strategy_blocks` JSON for `create_bot` or `run_backtest`. |
+
+### Grid Optimization
+
+| Tool | Description |
+|---|---|
+| `run_grid_backtest` | Parameter sweep backtest. Each combo costs 1 credit. Supports wait mode. |
+| `get_grid_status` | Check grid backtest progress and top 10 results. |
+| `get_grid_results` | Get full paginated grid results, sortable by various metrics. |
+
+### Analysis & Signals
+
+| Tool | Description |
+|---|---|
+| `get_analysis` | Get latest SMC analysis: direction, scores, AI summaries. Requires Analysis Subscription. |
+| `get_analysis_history` | List historical daily analysis runs. |
+| `get_signals` | Get trading signals from bots with direction, prices, execution status. |
+
+### Strategy Marketplace
+
+| Tool | Description |
+|---|---|
+| `list_strategies` | Browse marketplace strategies ranked by PnL, win rate, Sharpe. |
+| `get_strategy_detail` | Full strategy details + recent trades + subscription status. |
+| `subscribe_strategy` | Subscribe for copy-trading. Free strategies activate immediately; paid returns payment URL. |
 
 ### Account & Payments
 
 | Tool | Description |
 |---|---|
 | `get_account_info` | Current plan, credits balance, bot usage (used/max), and upgrade suggestions. |
-| `get_plan_info` | Static plan pricing and feature comparison across all tiers. |
-| `create_payment_link` | Create a Helio checkout link (card/USDC) for plan upgrades or credits top-up. |
-| `create_crypto_invoice` | Create a NOWPayments invoice (300+ cryptocurrencies) for plan upgrades or credits top-up. |
-| `verify_payment` | Check if a payment completed and the plan was upgraded. |
+| `get_plan_info` | Static plan pricing and feature comparison across tiers. |
+| `create_payment_link` | Create a Helio checkout link (credit card/USDC) for plan upgrades or credit top-ups. |
+| `create_crypto_invoice` | Create a NOWPayments invoice (300+ cryptocurrencies) for plan upgrades or credit top-ups. |
+| `verify_payment` | Confirm whether a payment completed and the plan was upgraded. |
 
-## Example Workflow
+## Usage Examples
 
-Here's how an AI agent typically uses these tools:
+Typical AI agent workflow:
 
 ```
-1. get_account_info        -> Check current plan, credits, bot capacity
-2. run_backtest            -> Test a strategy (e.g., EMA cross on BTC 4h)
-3. run_backtest            -> Compare with another strategy (e.g., RSI + ATR trail)
-4. create_bot              -> Deploy the winning strategy (copy strategy_blocks)
-5. list_exchanges          -> Find exchange_id
+1. build_strategy          -> AI generates strategy from description (1 credit)
+2. run_backtest            -> Validate on historical data
+3. run_grid_backtest       -> Optimize parameters
+4. get_grid_results        -> Find best parameter combo
+5. create_bot              -> Deploy with optimal params
 6. start_bot               -> Go live
-7. get_bot_performance     -> Monitor results
+7. get_signals             -> Monitor signal execution
+8. get_analysis            -> Check daily market analysis
+9. get_bot_performance     -> Review PnL
 ```
 
-If credits run out:
+When credits run out:
 ```
 get_account_info           -> credits_balance: 0
 create_payment_link        -> strategy_id: "credits_topup", amount_usd: 20
-  -> Returns payment URL -> user completes in browser
+  -> Returns payment URL -> User completes payment in browser
 verify_payment             -> Confirm credits added
-run_backtest               -> Resume backtesting
+run_backtest               -> Continue backtesting
 ```
 
 ## Supported Symbols
@@ -137,47 +183,47 @@ BTC, ETH, SOL, XRP, BNB, DOGE, LINK, TRX, SUI
 
 | Type | Description | Key Parameters |
 |---|---|---|
-| `ema_cross` | EMA crossover | `fast_period`, `slow_period` |
-| `macd_cross` | MACD signal crossover | `fast_period`, `slow_period`, `signal_period` |
-| `rsi` | RSI overbought/oversold | `period`, `overbought`, `oversold` |
-| `breakout` | Price breakout | `period`, `threshold` |
-| `volume_breakout` | Volume spike breakout | `period`, `multiplier` |
-| `bollinger_bounce` | Bollinger Band bounce | `period`, `std_dev` |
-| `smc_structure` | Smart Money Concept structure | `lookback` |
-| `smc_level_entry` | SMC level entry | `lookback`, `zone_type` |
+| `ema_cross` | EMA Crossover | `fast_period`, `slow_period` |
+| `macd_cross` | MACD Signal Cross | `fast_period`, `slow_period`, `signal_period` |
+| `rsi` | RSI Overbought/Oversold | `period`, `overbought`, `oversold` |
+| `breakout` | Price Breakout | `period`, `threshold` |
+| `volume_breakout` | Volume Breakout | `period`, `multiplier` |
+| `bollinger_bounce` | Bollinger Band Bounce | `period`, `std_dev` |
+| `smc_structure` | Smart Money Concept Structure | `lookback` |
+| `smc_level_entry` | SMC Key Level Entry | `lookback`, `zone_type` |
 
 ## Exit Block Types
 
 | Type | Description | Key Parameters |
 |---|---|---|
-| `fixed_pct` | Fixed percentage TP/SL | `tp_pct`, `sl_pct` |
-| `atr_mult` | ATR multiplier TP/SL | `tp_atr_mult`, `sl_atr_mult`, `atr_period` |
-| `atr_trail` | ATR trailing stop | `trail_atr_mult`, `atr_period` |
-| `time` | Time-based exit | `max_bars` |
-| `key_bar` | Key bar pattern exit | `pattern` |
-| `combined` | Multiple exit conditions | Combine any of the above |
+| `fixed_pct` | Fixed Percentage TP/SL | `tp_pct`, `sl_pct` |
+| `atr_mult` | ATR Multiple TP/SL | `tp_atr_mult`, `sl_atr_mult`, `atr_period` |
+| `atr_trail` | ATR Trailing Stop | `trail_atr_mult`, `atr_period` |
+| `time` | Time-based Exit | `max_bars` |
+| `key_bar` | Key Bar Pattern Exit | `pattern` |
+| `combined` | Multi-condition Combined Exit | Any combination of the above |
 
-## Pricing
+## Plan Pricing
 
 | Plan | Price | Bots | API Key | Symbols |
 |---|---|---|---|---|
-| Trial | Free (7 days) | 1 | Yes | BTC |
-| Starter | $19/mo | 3 | Yes | 5 |
-| Pro | $49/mo | 5 | Yes | 8 |
-| Expert | $99/mo | 8 | Yes | 10 |
-| Expert 10 | $125/mo | 10 | Yes | 10 |
-| Expert 15 | $190/mo | 15 | Yes | 10 |
-| Expert 30 | $385/mo | 30 | Yes | 10 |
-| Expert 60 | $775/mo | 60 | Yes | 10 |
+| Trial | Free (7 days) | 1 | Available | BTC |
+| Starter | $19/mo | 3 | Available | 5 |
+| Pro | $49/mo | 5 | Available | 8 |
+| Expert | $99/mo | 8 | Available | 10 |
+| Expert 10 | $125/mo | 10 | Available | 10 |
+| Expert 15 | $190/mo | 15 | Available | 10 |
+| Expert 30 | $385/mo | 30 | Available | 10 |
+| Expert 60 | $775/mo | 60 | Available | 10 |
 
-**API key access is available on all plans.** Start with the free trial, buy credits to run backtests, and upgrade when you need more bots or symbols.
+**All plans include API Key access.** Start with the free trial, purchase credits for backtesting, then upgrade your plan as needed for more bots or symbols.
 
-Credits are consumed per backtest run. Top up with `create_payment_link` or `create_crypto_invoice` using `strategy_id: "credits_topup"` (min $10, 17 credits per $1).
+Credits are consumed per backtest run. Use `create_payment_link` or `create_crypto_invoice` with `strategy_id: "credits_topup"` to top up (minimum $10, 17 credits per $1).
 
 ## Payment Methods
 
-- **Card / USDC**: Via Helio (`create_payment_link`) — Visa, Mastercard, or USDC on Solana
-- **300+ Cryptocurrencies**: Via NOWPayments (`create_crypto_invoice`) — BTC, ETH, SOL, USDT, and more
+- **Credit Card / USDC**: Via Helio (`create_payment_link`) — Visa, Mastercard, or USDC on Solana
+- **300+ Cryptocurrencies**: Via NOWPayments (`create_crypto_invoice`) — BTC, ETH, SOL, USDT, etc.
 
 ## Development
 

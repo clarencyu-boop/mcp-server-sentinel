@@ -4,7 +4,7 @@
 
 [Sentinel Bot](https://sentinel.redclawey.com) 的 MCP 伺服器 — 透過 AI 代理進行演算法交易回測、機器人管理及帳戶操作。
 
-本伺服器實作了 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)，提供 17 個工具，讓 AI 代理可以執行加密貨幣回測、部署交易機器人、管理帳戶及處理付款 — 全部透過自然語言完成。
+本伺服器實作了 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)，提供 36 個工具，讓 AI 代理可以執行加密貨幣回測、部署交易機器人、參數最佳化、瀏覽策略市集、管理帳戶及處理付款 — 全部透過自然語言完成。
 
 ## 快速開始
 
@@ -63,7 +63,7 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 | `SENTINEL_API_KEY` | 是 | — | 您的 API 金鑰（以 `sk-` 開頭） |
 | `SENTINEL_API_URL` | 否 | `https://sentinel.redclawey.com/api/v1` | API 基礎 URL |
 
-## 工具（17 個）
+## 工具（36 個）
 
 ### 回測
 
@@ -83,14 +83,58 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 | `get_bot` | 取得機器人完整詳情與目前狀態。 |
 | `start_bot` | 啟動機器人（需先設定 `exchange_id`）。發送即時交易訊號。 |
 | `stop_bot` | 停止執行中或暫停的機器人。 |
+| `pause_bot` | 暫停執行中的機器人（保留部位，停止新訊號）。僅限 RUNNING 狀態。 |
+| `recover_bot` | 恢復 HALTED 狀態的機器人（重置熔斷機制）。僅限 HALTED 狀態。 |
 | `delete_bot` | 永久刪除機器人（需先停止）。 |
 | `get_bot_performance` | 取得機器人的累計損益、勝率和交易次數。 |
+| `get_bot_trades` | 取得機器人的分頁交易紀錄，含進出場價格與損益。 |
 
 ### 交易所
 
 | 工具 | 說明 |
 |---|---|
 | `list_exchanges` | 列出已設定的交易所憑證（Binance、Bybit、OKX 等）。建立機器人時使用交易所 ID。 |
+
+### OKX 交易所
+
+| 工具 | 說明 |
+|---|---|
+| `okx_orderbook` | 取得 OKX 訂單簿（公開資料，無需憑證）。 |
+| `okx_funding_rate` | 取得 OKX 永續合約目前資金費率。 |
+| `okx_set_leverage` | 設定 OKX 槓桿與保證金模式（需 OKX 憑證）。 |
+| `okx_positions` | 取得目前 OKX 持倉（需 OKX 憑證）。 |
+| `okx_algo_order` | 在 OKX 下條件/演算法委託（止盈/止損/追蹤/OCO）。 |
+| `okx_market_overview` | 取得 OKX 漲幅榜與成交量排行（公開資料）。 |
+
+### AI 策略
+
+| 工具 | 說明 |
+|---|---|
+| `build_strategy` | 以自然語言透過 AI 生成交易策略。消耗 1 點。回傳 `strategy_blocks` JSON，可直接用於 `create_bot` 或 `run_backtest`。 |
+
+### Grid 最佳化
+
+| 工具 | 說明 |
+|---|---|
+| `run_grid_backtest` | 參數掃描回測。每組參數消耗 1 點。支援等待模式。 |
+| `get_grid_status` | 查詢 Grid 回測進度與前 10 名結果。 |
+| `get_grid_results` | 取得完整分頁 Grid 結果，可依各項指標排序。 |
+
+### 分析與訊號
+
+| 工具 | 說明 |
+|---|---|
+| `get_analysis` | 取得最新 SMC 分析：方向、評分、AI 摘要。需訂閱分析服務。 |
+| `get_analysis_history` | 列出歷史每日分析紀錄。 |
+| `get_signals` | 取得機器人交易訊號，含方向、價格、執行狀態。 |
+
+### 策略市集
+
+| 工具 | 說明 |
+|---|---|
+| `list_strategies` | 瀏覽市集策略，依損益、勝率、Sharpe 排名。 |
+| `get_strategy_detail` | 完整策略詳情 + 近期交易 + 訂閱狀態。 |
+| `subscribe_strategy` | 訂閱跟單交易。免費策略立即啟用；付費策略回傳付款連結。 |
 
 ### 帳戶與付款
 
@@ -107,13 +151,15 @@ export SENTINEL_API_KEY=sk-your-api-key-here
 AI 代理的典型工作流程：
 
 ```
-1. get_account_info        -> 查看目前方案、點數、機器人容量
-2. run_backtest            -> 測試策略（例：BTC 4h EMA 交叉）
-3. run_backtest            -> 比較另一策略（例：RSI + ATR 追蹤停損）
-4. create_bot              -> 部署勝出的策略（複製 strategy_blocks）
-5. list_exchanges          -> 找到 exchange_id
+1. build_strategy          -> AI 依描述生成策略（消耗 1 點）
+2. run_backtest            -> 以歷史資料驗證
+3. run_grid_backtest       -> 最佳化參數
+4. get_grid_results        -> 找出最佳參數組合
+5. create_bot              -> 以最佳參數部署
 6. start_bot               -> 上線交易
-7. get_bot_performance     -> 監控結果
+7. get_signals             -> 監控訊號執行
+8. get_analysis            -> 查看每日市場分析
+9. get_bot_performance     -> 檢視損益
 ```
 
 點數用完時：
