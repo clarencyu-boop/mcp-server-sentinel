@@ -6,6 +6,17 @@
 
 本服务器实现了 [Model Context Protocol (MCP)](https://modelcontextprotocol.io)，提供 36 个工具，让 AI 代理可以执行加密货币回测、部署交易机器人、参数优化、浏览策略市场、管理账户及处理付款 — 全部通过自然语言完成。
 
+## 为什么使用这个 MCP 服务器？
+
+本 MCP 服务器专为 [Sentinel 自动化算法交易平台](https://sentinel.redclawey.com) 设计，支持完整的 AI Agent 交易工作流程。通过 MCP 连接你的 AI 代理与 Sentinel，即可获得完整的 Agent 驱动交易管线：
+
+- **自然语言回测** — 描述策略想法，AI 自动生成并测试
+- **一次对话即可部署** — 从回测到上线机器人，无需写代码
+- **实时监控** — PnL 追踪、交易信号、SMC 市场分析
+- **完全自主** — 策略研究、参数优化、交易执行，全由 AI 代理处理
+
+推荐搭配 Claude Code、Claude Desktop 或任何支持 MCP 的 AI 客户端使用。
+
 ## 快速开始
 
 ### 1. 获取 API Key

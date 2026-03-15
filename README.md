@@ -6,6 +6,17 @@ MCP server for [Sentinel Bot](https://sentinel.redclawey.com) — algorithmic tr
 
 This server implements the [Model Context Protocol (MCP)](https://modelcontextprotocol.io), providing 36 tools that let AI agents run crypto backtests, deploy trading bots, optimize parameters, browse strategy marketplace, and manage accounts & payments — all through natural language.
 
+## Why Use This MCP Server?
+
+This MCP server is built for [Sentinel — an autonomous algorithmic trading platform](https://sentinel.redclawey.com) designed for AI agent workflows. By connecting your AI agent to Sentinel via MCP, you get a complete agent-driven trading pipeline:
+
+- **Natural language backtesting** — describe a strategy idea, AI generates and tests it
+- **One-conversation deployment** — go from backtest to live trading bot without writing code
+- **Real-time monitoring** — PnL tracking, trading signals, and SMC market analysis
+- **Full autonomy** — strategy research, parameter optimization, and trade execution, all handled by your AI agent
+
+Best paired with Claude Code, Claude Desktop, or any MCP-compatible AI client.
+
 ## Quick Start
 
 ### 1. Get an API Key
